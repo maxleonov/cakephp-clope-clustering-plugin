@@ -1,6 +1,7 @@
 <?php
+
 /**
  * CLOPE Clustering
- *
- * @author maxleonov
+
+ * @author maxleonov <maks.leonov@gmail.com>
  */
