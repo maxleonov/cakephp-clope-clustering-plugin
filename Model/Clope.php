@@ -45,6 +45,11 @@ class Clope extends AppModel {
 	public function clusterize($transactions, $params) {
 		$this->repulsion = $params['repulsion'];
 
+		// Empty data storage
+		$this->ClopeCluster->deleteAll('1=1');
+		$this->ClopeTransaction->deleteAll('1=1');
+		$this->ClopeAttribute->deleteAll('1=1');
+
 		// Add transactions with attributes
 		foreach($transactions as $id=>&$transaction) {
 			$data = array(
@@ -62,11 +67,8 @@ class Clope extends AppModel {
 		// Result
 		$groupedByCluster = array();
 		foreach ($transactions as $id=>&$transaction) {
-			// ->clusterID()
-			// res[ clusterID ] [] = trans
 			$groupedByCluster[$this->ClopeTransaction->clusterID($id)][] = $transaction;
 			unset($transactions[$id]);
-			// del( trans )
 		}
 
 		return $groupedByCluster;
