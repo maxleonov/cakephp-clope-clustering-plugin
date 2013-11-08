@@ -1,7 +1,7 @@
 cakephp-clope-clustering-plugin
 ===============================
 
-Cake-PHP plugin for CLOPE clustering algorithm
+Cake-PHP plugin for [CLOPE clustering algorithm](https://drive.google.com/file/d/1---LtHj1jLHCOcCUZChMRZQVirmt9nR6F8Zmw6bgNBBNyiBB6zmWsNuGIOfF)
 
 
 ## Installation
