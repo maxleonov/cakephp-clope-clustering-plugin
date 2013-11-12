@@ -6,10 +6,12 @@
  * @author maxleonov <maks.leonov@gmail.com>
  */
 
+App::uses('ClopeSchema', 'ClopeClustering.Model');
+
 /**
  * 
  */
-class ClopeTransaction extends AppModel {
+class ClopeTransaction extends ClopeSchema {
 
 	/**
 	 * {@inheritdoc}
@@ -38,6 +40,13 @@ class ClopeTransaction extends AppModel {
 	/**
 	 * {@inheritdoc}
 	 *
+	 * @var string
+	 */
+	public $useTable = 'clope_transactions';
+
+	/**
+	 * {@inheritdoc}
+	 *
 	 * @var array
 	 */
 	public $actsAs = array('Containable');
@@ -45,12 +54,34 @@ class ClopeTransaction extends AppModel {
 	/**
 	 * {@inheritdoc}
 	 *
-	 * @var string
+	 * @var array
 	 */
-	public $useTable = 'clope_transactions';
+	public $_schema = array(
+		'id' => array(
+			'type' => 'integer',
+			'null' => false,
+			'default' => null,
+			'length' => 5,
+			'key' => 'primary'
+		),
+		'custom_id' => array(
+			'type' => 'string',
+			'null' => false,
+			'default' => null,
+			'length' => 255,
+			'collate' => 'utf8_bin',
+			'charset' => 'utf8'
+		),
+		'cluster_id' => array(
+			'type' => 'integer',
+			'null' => true,
+			'default' => null,
+			'length' => 5
+		)
+	);
 
 	/**
-	 *
+	 * @var int
 	 */
 	private $pointer = -1;
 

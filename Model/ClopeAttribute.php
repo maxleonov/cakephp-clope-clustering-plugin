@@ -6,10 +6,12 @@
  * @author maxleonov <maks.leonov@gmail.com>
  */
 
+App::uses('ClopeSchema', 'ClopeClustering.Model');
+
 /**
  * 
  */
-class ClopeAttribute extends AppModel {
+class ClopeAttribute extends ClopeSchema {
 
 	/**
 	 * {@inheritdoc}
@@ -36,6 +38,43 @@ class ClopeAttribute extends AppModel {
 	 * @var array
 	 */
 	public $actsAs = array('Containable');
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @var array
+	 */
+	public $_schema = array(
+		'id' => array(
+			'type' => 'integer',
+			'null' => false,
+			'default' => null,
+			'length' => 10,
+			#'unsigned' => true,
+			'key' => 'primary'
+		),
+		'transaction_id' => array(
+			'type' => 'integer',
+			'null' => false,
+			'default' => null,
+			'key' => 'mul',
+			'length' => 5
+		),
+		'attribute' => array(
+			'type' => 'string',
+			'null' => false,
+			'default' => null,
+			'length' => 255,
+			'collate' => 'utf8_bin',
+			'charset' => 'utf8'
+		),
+		'indexes' => array(
+			'itransaction_id' => array(
+				'column' => 'transaction_id',
+				'unique' => false
+			)
+		)
+	);
 
 	/**
 	 * Count of given Attribute in given Cluster

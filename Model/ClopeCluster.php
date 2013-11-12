@@ -6,10 +6,12 @@
  * @author maxleonov <maks.leonov@gmail.com>
  */
 
+App::uses('ClopeSchema', 'ClopeClustering.Model');
+
 /**
  * 
  */
-class ClopeCluster extends AppModel {
+class ClopeCluster extends ClopeSchema {
 
 	/**
 	 * {@inheritdoc}
@@ -36,6 +38,39 @@ class ClopeCluster extends AppModel {
 	 * @var array
 	 */
 	public $actsAs = array('Containable');
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @var array
+	 */
+	public $_schema = array(
+		'id' => array(
+			'type' => 'integer',
+			'null' => false,
+			'default' => null,
+			'length' => 5,
+			'key' => 'primary'
+		),
+		'width' => array(
+			'type' => 'integer',
+			'null' => true,
+			'default' => null,
+			'length' => 5
+		),
+		'size' => array(
+			'type' => 'integer',
+			'null' => true,
+			'default' => null,
+			'length' => 5
+		),
+		'transactions' => array(
+			'type' => 'integer',
+			'null' => true,
+			'default' => null,
+			'length' => 5
+		)
+	);
 
 	/**
 	 * Cluster size
