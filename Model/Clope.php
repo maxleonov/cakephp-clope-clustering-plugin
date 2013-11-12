@@ -8,6 +8,7 @@
  * @author maxleonov <maks.leonov@gmail.com>
  */
 
+
 /**
  * 
  */
@@ -43,14 +44,13 @@ class Clope extends AppModel {
 	 * @return array
 	 */
 	public function clusterize($transactions, $params) {
+		$this->ClopeCluster->createSchema($this->clusteringID());
+		$this->ClopeTransaction->createSchema($this->clusteringID());
+		$this->ClopeAttribute->createSchema($this->clusteringID());
+
 		$this->repulsion = $params['repulsion'];
 
-		// Empty data storage
-		$this->ClopeCluster->deleteAll('1=1');
-		$this->ClopeTransaction->deleteAll('1=1');
-		$this->ClopeAttribute->deleteAll('1=1');
-
-		// Add transactions with attributes
+		// Add transactions
 		foreach($transactions as $id=>&$transaction) {
 			$data = array(
 				'ClopeTransaction' => array(
@@ -197,6 +197,22 @@ class Clope extends AppModel {
 	 */
 	private function setClusteringIncomplete() {
 		$this->clustering_changed=true;
+	}
+
+	/**
+	 * Generate random string
+	 *
+	 * @param int $length
+	 *
+	 * @return string
+	 */
+	private function clusteringId() {
+		if (isset($this->clusteringId)) {
+			return $this->clusteringId;
+		} else {
+			$this->clusteringId = substr(md5(microtime()), rand(0, 26), 5);
+			return $this->clusteringId;
+		}
 	}
 
 }
