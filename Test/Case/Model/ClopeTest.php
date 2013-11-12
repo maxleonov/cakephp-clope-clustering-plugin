@@ -14,21 +14,10 @@ class ClopeTest extends CakeTestCase {
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * @var array
-	 */
-	public $fixtures = array(
-		'plugin.ClopeClustering.ClopeTransaction',
-		'plugin.ClopeClustering.ClopeAttribute',
-		'plugin.ClopeClustering.ClopeCluster'
-	);
-
-	/**
-	 * {@inheritdoc}
 	 */
 	public function setUp() {
 		parent::setUp();
-		$this->clope = ClassRegistry::init('ClopeClustering.Clope');
+		$this->Clope = ClassRegistry::init('ClopeClustering.Clope');
 	}
 
 	/**
@@ -51,7 +40,7 @@ class ClopeTest extends CakeTestCase {
 			'repulsion' => 2.0,
 		);
 
-		$result = $this->clope->clusterize($transactions, $params);
+		$result = $this->Clope->clusterize($transactions, $params);
 
 		$expected = array(
 			(int) 1 => array(
