@@ -28,18 +28,18 @@ class ClopeSchema extends AppModel {
 	 * Create Schema.
 	 * Must be called exactly once
 	 *
-	 * @param int|string $id
+	 * @param int|string $schemaId
 	 */
-	public function createSchema($id) {
-		if (isset($this->Schema)) {
+	public function createSchema($schemaId) {
+		if (isset($this->schemaId)) {
 			throw new Exception(__CLASS__.'::createSchema() must be called exactly once');
 		}
 
-		$useTableNew = $this->useTable.'_'.$id;
+		$this->schemaId = $schemaId;
+
+		$useTableNew = $this->useTable.'_'.$this->schemaId;
 		$db = ConnectionManager::getDataSource($this->useDbConfig);
-		$this->Schema = new CakeSchema(array('connection' => $db));
-		$this->Schema->build(array($useTableNew => $this->_schema));
-		$db->execute($db->createSchema($this->Schema));
+		$db->execute($db->createSchema($this->_schema($useTableNew)));
 		$this->useTable = $useTableNew;
 	}
 
@@ -47,11 +47,34 @@ class ClopeSchema extends AppModel {
 	 * Drop Schema
 	 */
 	public function dropSchema() {
-		if (!isset($this->Schema)) {
+		if (!isset($this->schemaId)) {
 			return;
 		}
 
 		$db = ConnectionManager::getDataSource($this->useDbConfig);
-		$db->execute($db->dropSchema($this->Schema));
+		$db->execute($db->dropSchema($this->_schema($this->useTable)));
 	}
+
+	/**
+	 * Return CakeSchema object for given Schema name
+	 *
+	 * @param string $name
+	 *
+	 * @return CakeSchema
+	 */
+	public function _schema($name) {
+		static $Schema = null;
+
+		if (!is_null($Schema)) {
+			return $Schema;
+		} else {
+			$db = ConnectionManager::getDataSource($this->useDbConfig);
+			$Schema = new CakeSchema(array('connection' => $db));
+			$Schema->build(array($name => $this->_schema));
+			Cache::drop('_cake_model_');
+			$db->reconnect();
+			return $Schema;
+		}
+	}
+
 }
