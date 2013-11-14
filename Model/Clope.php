@@ -2,10 +2,13 @@
 
 /**
  * Clope Clustering
-
+ *
  * @link https://drive.google.com/file/d/1---LtHj1jLHCOcCUZChMRZQVirmt9nR6F8Zmw6bgNBBNyiBB6zmWsNuGIOfF Clope Clustering Algorithm
-
+ *
  * @author maxleonov <maks.leonov@gmail.com>
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 
 
@@ -75,7 +78,7 @@ class Clope extends AppModel {
 	}
 
 	/**
-	 * 
+	 * Clustering algorithm
 	 */
 	private function _clusterize() {
 		$this->setClusteringIncomplete();
@@ -93,7 +96,12 @@ class Clope extends AppModel {
 	}
 
 	/**
-	 * 
+	 * Best Cluster for given Transaction
+	 *
+	 * @param array $transaction
+	 * @param int $repulsion
+	 *
+	 * @return int
 	 */
 	private function bestClusterID($transaction, $repulsion) {
 		$this->clusterFeatures = array();
@@ -114,7 +122,10 @@ class Clope extends AppModel {
 	}
 
 	/**
-	 * 
+	 * Update Cluster Features: size, width, transactions count
+	 *
+	 * @param int $fromClusterID
+	 * @param int $toClusterID
 	 */
 	private function _updateClusterFeatures($fromClusterID, $toClusterID) {
 		if ($fromClusterID == $toClusterID) {

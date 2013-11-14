@@ -4,6 +4,9 @@
  * Transaction
 
  * @author maxleonov <maks.leonov@gmail.com>
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 
 App::uses('ClopeSchema', 'ClopeClustering.Model');
@@ -81,6 +84,13 @@ class ClopeTransaction extends ClopeSchema {
 	);
 
 	/**
+	 * {@inheritdoc}
+	 *
+	 * @var int
+	 */
+	public $recursive = -1;
+
+	/**
 	 * @var int
 	 */
 	private $pointer = -1;
@@ -99,6 +109,7 @@ class ClopeTransaction extends ClopeSchema {
 	 */
 	public function getNext() {
 		$this->pointer += 1;
+		$this->contain('ClopeAttribute');
 		return $this->find('first', array(
 			'limit' => 1,
 			'offset' => $this->pointer

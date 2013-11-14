@@ -2,8 +2,11 @@
 
 /**
  * Cluster
-
+ *
  * @author maxleonov <maks.leonov@gmail.com>
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 
 App::uses('ClopeSchema', 'ClopeClustering.Model');
@@ -71,6 +74,13 @@ class ClopeCluster extends ClopeSchema {
 			'length' => 5
 		)
 	);
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @var int
+	 */
+	public $recursive = -1;
 
 	/**
 	 * Cluster size

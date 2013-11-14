@@ -4,6 +4,9 @@
  * Attribute
 
  * @author maxleonov <maks.leonov@gmail.com>
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 
 App::uses('ClopeSchema', 'ClopeClustering.Model');
@@ -75,6 +78,13 @@ class ClopeAttribute extends ClopeSchema {
 			)
 		)
 	);
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @var int
+	 */
+	public $recursive = -1;
 
 	/**
 	 * Count of given Attribute in given Cluster

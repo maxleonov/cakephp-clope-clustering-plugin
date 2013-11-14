@@ -2,8 +2,11 @@
 
 /**
  * Create & Remove Model Schema
-
+ *
  * @author maxleonov <maks.leonov@gmail.com>
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 
 App::uses('ConnectionManager', 'Model');
@@ -24,7 +27,7 @@ class ClopeSchema extends AppModel {
 	/**
 	 * Create Schema.
 	 * Must be called exactly once
-	 * 
+	 *
 	 * @param int|string $id
 	 */
 	public function createSchema($id) {
