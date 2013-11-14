@@ -66,35 +66,35 @@ class ClopeTest extends CakeTestCase {
 				)
 			),
 			(int) 2 => array(
-				(int) 0 => array(
+				(int) 3 => array(
 					(int) 0 => 'a5',
 					(int) 1 => 'a6',
 					(int) 2 => 'a7'
 				),
-				(int) 1 => array(
+				(int) 4 => array(
 					(int) 0 => 'a5',
 					(int) 1 => 'a6',
 					(int) 2 => 'a7'
 				)
 			),
 			(int) 3 => array(
-				(int) 0 => array(
+				(int) 5 => array(
 					(int) 0 => 'a8',
 					(int) 1 => 'a9',
 					(int) 2 => 'a10'
 				),
-				(int) 1 => array(
+				(int) 6 => array(
 					(int) 0 => 'a8',
 					(int) 1 => 'a9',
 					(int) 2 => 'a10'
 				),
-				(int) 2 => array(
+				(int) 7 => array(
 					(int) 0 => 'a8',
 					(int) 1 => 'a9',
 					(int) 2 => 'a10',
 					(int) 3 => 'a11'
 				),
-				(int) 3 => array(
+				(int) 8 => array(
 					(int) 0 => 'a8',
 					(int) 1 => 'a9',
 					(int) 2 => 'a10',
