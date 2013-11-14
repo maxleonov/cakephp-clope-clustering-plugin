@@ -97,7 +97,7 @@ class ClopeCluster extends ClopeSchema {
 	/**
 	 * Cluser width
 	 * 
-   	 * @param int $clusterID
+	 * @param int $clusterID
 	 *
 	 * @return int
 	 */

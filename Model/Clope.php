@@ -27,7 +27,7 @@ class Clope extends AppModel {
 	/**
 	 * @var bool
 	 */
-    private $clustering_changed = false;
+	private $clustering_changed = false;
 
 	/**
 	 * Constructor
