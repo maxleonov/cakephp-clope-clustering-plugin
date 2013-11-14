@@ -70,7 +70,7 @@ class Clope extends AppModel {
 		// Result
 		$groupedByCluster = array();
 		foreach ($transactions as $id=>&$transaction) {
-			$groupedByCluster[$this->ClopeTransaction->clusterID($id)][] = $transaction;
+			$groupedByCluster[$this->ClopeTransaction->clusterID($id)][$id] = $transaction;
 			unset($transactions[$id]);
 		}
 
