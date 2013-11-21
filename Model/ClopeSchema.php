@@ -13,7 +13,12 @@ App::uses('ConnectionManager', 'Model');
 App::uses('CakeSchema', 'Model');
 
 /**
- * 
+ * Create & Remove Model Schema
+ * To create schema, call ->createSchema($schemaId)
+ * Schema will be removed when model object is destroyed.
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 class ClopeSchema extends AppModel {
 
@@ -32,7 +37,7 @@ class ClopeSchema extends AppModel {
 	 */
 	public function createSchema($schemaId) {
 		if (isset($this->schemaId)) {
-			throw new Exception(__CLASS__.'::createSchema() must be called exactly once');
+			throw new Exception(__CLASS__ . '::createSchema() must be called exactly once');
 		}
 
 		$this->schemaId = $schemaId;
@@ -46,7 +51,7 @@ class ClopeSchema extends AppModel {
 	/**
 	 * Drop Schema
 	 */
-	public function dropSchema() {
+	protected function dropSchema() {
 		if (!isset($this->schemaId)) {
 			return;
 		}
@@ -62,7 +67,7 @@ class ClopeSchema extends AppModel {
 	 *
 	 * @return CakeSchema
 	 */
-	public function _schema($name) {
+	protected function _schema($name) {
 		static $Schema = null;
 
 		if (!is_null($Schema)) {

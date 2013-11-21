@@ -13,7 +13,10 @@
 
 
 /**
- * 
+ * Clope Clustering
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 class Clope extends AppModel {
 
@@ -30,9 +33,11 @@ class Clope extends AppModel {
 	private $clustering_changed = false;
 
 	/**
-	 * Constructor
+	 * {@inheritdoc}
 	 */
-	public function __construct() {
+	public function __construct($id = false, $table = null, $ds = null) {
+		parent::__construct();
+
 		$this->ClopeTransaction = ClassRegistry::init('ClopeClustering.ClopeTransaction');
 		$this->ClopeCluster = ClassRegistry::init('ClopeClustering.ClopeCluster');
 		$this->ClopeAttribute = ClassRegistry::init('ClopeClustering.ClopeAttribute');
@@ -54,15 +59,16 @@ class Clope extends AppModel {
 		$this->repulsion = $params['repulsion'];
 
 		// Add transactions
-		foreach($transactions as $id=>&$transaction) {
+		foreach($transactions as $id=>$transaction) {
 			$data = array(
 				'ClopeTransaction' => array(
 					'custom_id' => $id
-				), 
-				'ClopeAttribute' => Hash::map($transaction, '{n}', create_function('$attr', 'return array(\'attribute\'=>$attr);'))
+				),
+				'ClopeAttribute' => Hash::map($transaction, '{n}', function($attr){ return array('attribute' => $attr); })
 			);
 			$this->ClopeTransaction->saveAssociated($data, array('deep' => true));
 		}
+		unset($transaction);
 
 		// Clustering
 		$this->_clusterize();
@@ -96,10 +102,10 @@ class Clope extends AppModel {
 	}
 
 	/**
-	 * Best Cluster for given Transaction
+	 * Find Best Cluster for given Transaction
 	 *
 	 * @param array $transaction
-	 * @param int $repulsion
+	 * @param float $repulsion
 	 *
 	 * @return int
 	 */
@@ -136,7 +142,7 @@ class Clope extends AppModel {
 		if (!is_null($fromClusterID)) {
 			$this->ClopeCluster->updateAll(
 				array(
-					'size' => $this->clusterFeatures[$fromClusterID]['size'], 
+					'size' => $this->clusterFeatures[$fromClusterID]['size'],
 					'width' => $this->clusterFeatures[$fromClusterID]['width'],
 					'transactions' => 'transactions - 1'
 				),
@@ -147,7 +153,7 @@ class Clope extends AppModel {
 		// Update cluster TO which Transaction was moved
 		$this->ClopeCluster->updateAll(
 			array(
-				'size' => $this->clusterFeatures[$toClusterID]['size'], 
+				'size' => $this->clusterFeatures[$toClusterID]['size'],
 				'width' => $this->clusterFeatures[$toClusterID]['width'],
 				'transactions' => 'transactions + 1'
 			),
@@ -156,7 +162,14 @@ class Clope extends AppModel {
 	}
 
 	/**
-	 * 
+	 * Computes Profit function
+	 * Finds out how "good" it is to Put given Transaction into given Cluster.
+	 *
+	 * @param array $cluster
+	 * @param array $transaction
+	 * @param float $repulsion
+	 *
+	 * @return float
 	 */
 	private function deltaAdd($cluster, $transaction, $repulsion) {
 		$clusterID = $cluster['ClopeCluster']['id'];
@@ -173,7 +186,14 @@ class Clope extends AppModel {
 	}
 
 	/**
-	 * 
+	 * Computes Profit function
+	 * Finds out how "good" it is to Remove given Transaction from given Cluster.
+	 *
+	 * @param array $cluster
+	 * @param array $transaction
+	 * @param float $repulsion
+	 *
+	 * @return float
 	 */
 	private function deltaRemove($cluster, $transaction, $repulsion) {
 		$clusterID = $cluster['ClopeCluster']['id'];
@@ -190,24 +210,26 @@ class Clope extends AppModel {
 	}
 
 	/**
-	 * 
+	 * Returns if current Clustering procedure is complete
+	 *
+	 * @return bool
 	 */
 	private function ifClusteringComplete() {
 		return !(bool)$this->clustering_changed;
 	}
 
 	/**
-	 * 
+	 * Mark current Clustering session as Complete
 	 */
 	private function setClusteringComplete() {
-		$this->clustering_changed=false;
+		$this->clustering_changed = false;
 	}
 
 	/**
-	 * 
+	 * Mark current Clustering session as Incomplete
 	 */
 	private function setClusteringIncomplete() {
-		$this->clustering_changed=true;
+		$this->clustering_changed = true;
 	}
 
 	/**

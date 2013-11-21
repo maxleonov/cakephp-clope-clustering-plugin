@@ -2,7 +2,7 @@
 
 /**
  * Attribute
-
+ *
  * @author maxleonov <maks.leonov@gmail.com>
  *
  * @package ClopeClustering
@@ -12,7 +12,10 @@
 App::uses('ClopeSchema', 'ClopeClustering.Model');
 
 /**
- * 
+ * Attribute
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 class ClopeAttribute extends ClopeSchema {
 
@@ -88,7 +91,7 @@ class ClopeAttribute extends ClopeSchema {
 
 	/**
 	 * Count of given Attribute in given Cluster
-	 * 
+	 *
 	 * @param string $attribute
 	 * @param int $clusterId
 	 *
@@ -106,7 +109,7 @@ class ClopeAttribute extends ClopeSchema {
 
 		return $this->find('count', array(
 			'conditions' => array(
-				'transaction_id' => $transaction_ids, 
+				'transaction_id' => $transaction_ids,
 				'attribute' => $attribute
 		)));
 	}

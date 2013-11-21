@@ -2,7 +2,7 @@
 
 /**
  * Transaction
-
+ *
  * @author maxleonov <maks.leonov@gmail.com>
  *
  * @package ClopeClustering
@@ -12,7 +12,10 @@
 App::uses('ClopeSchema', 'ClopeClustering.Model');
 
 /**
- * 
+ * Transaction
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 class ClopeTransaction extends ClopeSchema {
 
@@ -118,7 +121,7 @@ class ClopeTransaction extends ClopeSchema {
 
 	/**
 	 * Move Transaction from one Cluster to another
-	 * 
+	 *
 	 * @param int $transactionID
 	 * @param int $fromClusterID
 	 * @param int $toClusterID
@@ -132,7 +135,7 @@ class ClopeTransaction extends ClopeSchema {
 
 		$this->updateAll(
 			array('cluster_id' => $toClusterID),
-			array('ClopeTransaction.id' => $transactionID)
+			array("{$this->alias}.id" => $transactionID)
 		);
 
 		return true;
@@ -140,7 +143,7 @@ class ClopeTransaction extends ClopeSchema {
 
 	/**
 	 * Cluster ID for given Transaction
-	 * 
+	 *
 	 * @param int $transactionCustomID
 	 *
 	 * @return int

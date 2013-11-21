@@ -12,7 +12,10 @@
 App::uses('ClopeSchema', 'ClopeClustering.Model');
 
 /**
- * 
+ * Cluster
+ *
+ * @package ClopeClustering
+ * @subpackage Model
  */
 class ClopeCluster extends ClopeSchema {
 
@@ -84,7 +87,7 @@ class ClopeCluster extends ClopeSchema {
 
 	/**
 	 * Cluster size
-	 * 
+	 *
 	 * @param int $clusterID
 	 *
 	 * @return int
@@ -96,7 +99,7 @@ class ClopeCluster extends ClopeSchema {
 
 	/**
 	 * Cluser width
-	 * 
+	 *
 	 * @param int $clusterID
 	 *
 	 * @return int
@@ -108,7 +111,7 @@ class ClopeCluster extends ClopeSchema {
 
 	/**
 	 * Count of Transactions in given Cluster
-	 * 
+	 *
 	 * @param int $clusterID
 	 *
 	 * @return int
@@ -116,17 +119,6 @@ class ClopeCluster extends ClopeSchema {
 	public function countOfTransactions($clusterID) {
 		$this->id = $clusterID;
 		return $this->field('transactions');
-	}
-
-	/**
-	 * 
-	 */
-	public function getInfo($id) {
-		$cluster = $this->find('first', array(
-			'conditions' => array('id' => $id),
-			'fields' => array('size', 'width', 'transactions')
-		));
-		return $cluster['ClopeCluster'];
 	}
 
  }

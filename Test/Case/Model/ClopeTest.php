@@ -11,7 +11,10 @@
  */
 
 /**
- * 
+ * Tests
+ *
+ * @package ClopeClustering
+ * @subpackage Test
  */
 class ClopeTest extends CakeTestCase {
 
@@ -24,7 +27,7 @@ class ClopeTest extends CakeTestCase {
 	}
 
 	/**
-	 *
+	 * Test clustering algorithm
 	 */
 	public function testBasicFunctionality() {
 		$transactions = array(
