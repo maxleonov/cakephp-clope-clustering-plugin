@@ -36,15 +36,26 @@ class ClopeSchema extends AppModel {
 	 * @param int|string $schemaId
 	 */
 	public function createSchema($schemaId) {
+		if (!isset($this->_initialUseTable)) {
+			$this->_initialUseTable = $this->useTable;
+		}
+
 		if (isset($this->schemaId)) {
-			throw new Exception(__CLASS__ . '::createSchema() must be called exactly once');
+			$this->dropSchema();
 		}
 
 		$this->schemaId = $schemaId;
 
-		$useTableNew = $this->useTable.'_'.$this->schemaId;
+		$useTableNew = $this->_initialUseTable.'_'.$this->schemaId;
 		$db = ConnectionManager::getDataSource($this->useDbConfig);
-		$db->execute($db->createSchema($this->_schema($useTableNew)));
+
+		try {
+			$db->execute($db->createSchema($this->_schema($useTableNew)));
+		} catch(Exception $e) {
+			$this->dropSchema();
+			$db->execute($db->createSchema($this->_schema($useTableNew)));
+		}
+
 		$this->useTable = $useTableNew;
 	}
 
@@ -69,8 +80,9 @@ class ClopeSchema extends AppModel {
 	 */
 	protected function _schema($name) {
 		static $Schema = null;
+		static $prev_name = null;
 
-		if (!is_null($Schema)) {
+		if (!is_null($Schema) && $prev_name == $name) {
 			return $Schema;
 		} else {
 			$db = ConnectionManager::getDataSource($this->useDbConfig);
