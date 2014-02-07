@@ -1,0 +1,31 @@
+{
+  "name": "maxleonov/cakephp-clope-clustering-plugin",
+  "description": "Cake-PHP plugin for CLOPE clustering algorithm",
+  "type": "cakephp-plugin",
+  "keywords": [
+    "cakephp",
+    "clope",
+	"clustering",
+    "plugin"
+  ],
+  "homepage": "https://github.com/maxleonov/cakephp-clope-clustering-plugin",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Max Leonov",
+      "email": "maks.leonov@gmail.com",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "composer/installers": "*"
+  },
+  "support": {
+    "email": "maks.leonov@gmail.com",
+    "issues": "https://github.com/imsamurai/cakephp-clope-clustering-plugin/issues",
+    "source": "https://github.com/imsamurai/cakephp-clope-clustering-plugin"
+  },
+  "extra": {
+    "installer-name": "ClopeClustering"
+  }
+}
