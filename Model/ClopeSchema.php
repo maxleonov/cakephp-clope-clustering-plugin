@@ -13,7 +13,7 @@ App::uses('CakeSchema', 'Model');
 
 /**
  * Create & Remove Model Schema
- * To create schema, call ->_createSchema($schemaId)
+ * To create schema, call ->createSchema($schemaId)
  * Schema will be removed when model object is destroyed.
  *
  * @package ClopeClustering
@@ -34,25 +34,15 @@ class ClopeSchema extends AppModel {
 	 * @var int
 	 */
 	public $recursive = -1;
-
-	/**
-	 * {@inheritdoc}
-	 * 
-	 * @param int|string $id
-	 * @param string $table
-	 * @param string $ds
-	 */
-	public function __construct($id = false, $table = null, $ds = null) {
-		parent::__construct($id, $table, $ds);
-		$this->useTable = $this->useTable . '_' . $this->_tableId();
-		$this->_createSchema();
-	}
+	
+	protected $_tableName = null;
+	protected $_Schema = null;
 	
 	/**
 	 * Destructor
 	 */
 	public function __destruct() {
-		$this->_dropSchema();
+		$this->dropSchema();
 	}
 
 	/**
@@ -61,22 +51,24 @@ class ClopeSchema extends AppModel {
 	 *
 	 * @param int|string $schemaId
 	 */
-	protected function _createSchema() {
-		$this->_dropSchema();
+	public function createSchema() {
+		$this->_tableName = null;
+		$this->_Schema = null;
+		
 		$db = ConnectionManager::getDataSource($this->useDbConfig);
-
 		try {
 			$db->execute($db->createSchema($this->_schema()));
 		} catch (Exception $e) {
-			$this->_dropSchema();
+			$this->dropSchema();
 			$db->execute($db->createSchema($this->_schema()));
 		}		
+		$this->setSource($this->_tableName());
 	}
 
 	/**
 	 * Drop Schema
 	 */
-	protected function _dropSchema() {
+	public function dropSchema() {
 		$db = ConnectionManager::getDataSource($this->useDbConfig);
 		$db->execute($db->dropSchema($this->_schema()));
 	}
@@ -87,18 +79,17 @@ class ClopeSchema extends AppModel {
 	 * @return CakeSchema
 	 */
 	protected function _schema() {
-		static $Schema = null;
-
-		if ($Schema) {
-			return $Schema;
+		if ($this->_Schema) {
+			return $this->_Schema;
 		}
 
 		$db = ConnectionManager::getDataSource($this->useDbConfig);
-		$Schema = new CakeSchema(array('connection' => $db));
-		$Schema->build(array($this->useTable => $this->_schema));
+		$this->_Schema = new CakeSchema(array('connection' => $db));
+		$this->_Schema->build(array($this->_tableName() => $this->_schema));
 		Cache::drop('_cake_model_');
+		$db->cacheSources = false;
 		$db->reconnect();
-		return $Schema;
+		return $this->_Schema;
 	}
 
 	/**
@@ -106,11 +97,10 @@ class ClopeSchema extends AppModel {
 	 *
 	 * @return string
 	 */
-	protected function _tableId() {
-		static $tableId = null;
-		if (!$tableId) {
-			$tableId = substr(md5(microtime()), rand(0, 26), 5);
+	protected function _tableName() {
+		if (!$this->_tableName) {
+			$this->_tableName = $this->useTablePattern . '_' . mt_rand(0, PHP_INT_MAX);
 		} 
-		return $tableId;
+		return $this->_tableName;
 	}
 }

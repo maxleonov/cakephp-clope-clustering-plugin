@@ -45,7 +45,6 @@ class Clope extends AppModel {
 	 */
 	public function __construct($id = false, $table = null, $ds = null) {
 		parent::__construct();
-
 		$this->ClopeTransaction = ClassRegistry::init('ClopeClustering.ClopeTransaction');
 		$this->ClopeCluster = ClassRegistry::init('ClopeClustering.ClopeCluster');
 		$this->ClopeAttribute = ClassRegistry::init('ClopeClustering.ClopeAttribute');
@@ -60,6 +59,10 @@ class Clope extends AppModel {
 	 * @return array
 	 */
 	public function clusterize($transactions, $params) {
+		$this->ClopeTransaction->createSchema();
+		$this->ClopeCluster->createSchema();
+		$this->ClopeAttribute->createSchema();
+		
 		$this->repulsion = $params['repulsion'];
 
 		// Add transactions
@@ -85,6 +88,10 @@ class Clope extends AppModel {
 			$groupedByCluster[$this->ClopeTransaction->clusterID($id)][$id] = $transaction;
 			unset($transactions[$id]);
 		}
+		
+		$this->ClopeTransaction->dropSchema();
+		$this->ClopeCluster->dropSchema();
+		$this->ClopeAttribute->dropSchema();
 
 		return $groupedByCluster;
 	}

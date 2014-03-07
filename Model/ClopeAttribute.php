@@ -35,7 +35,7 @@ class ClopeAttribute extends ClopeSchema {
 	 *
 	 * @var string
 	 */
-	public $useTable = 'clope_attributes';
+	public $useTablePattern = 'clope_attributes';
 
 	/**
 	 * {@inheritdoc}

@@ -35,7 +35,7 @@ class ClopeCluster extends ClopeSchema {
 	 *
 	 * @var string
 	 */
-	public $useTable = 'clope_clusters';
+	public $useTablePattern = 'clope_clusters';
 
 	/**
 	 * {@inheritdoc}

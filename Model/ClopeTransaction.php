@@ -47,7 +47,7 @@ class ClopeTransaction extends ClopeSchema {
 	 *
 	 * @var string
 	 */
-	public $useTable = 'clope_transactions';
+	public $useTablePattern = 'clope_transactions';
 
 	/**
 	 * {@inheritdoc}
