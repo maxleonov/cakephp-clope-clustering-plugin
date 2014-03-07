@@ -35,7 +35,18 @@ class ClopeSchema extends AppModel {
 	 */
 	public $recursive = -1;
 	
+	/**
+	 * Cached table name
+	 *
+	 * @var string 
+	 */
 	protected $_tableName = null;
+	
+	/**
+	 * Model schema
+	 *
+	 * @var CakeSchema 
+	 */
 	protected $_Schema = null;
 	
 	/**
