@@ -8,7 +8,6 @@
  * @package ClopeClustering
  * @subpackage Model
  */
-
 App::uses('ClopeSchema', 'ClopeClustering.Model');
 
 /**
@@ -43,14 +42,7 @@ class ClopeCluster extends ClopeSchema {
 	 *
 	 * @var array
 	 */
-	public $actsAs = array('Containable');
-
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @var array
-	 */
-	public $_schema = array(
+	protected $_schema = array(
 		'id' => array(
 			'type' => 'integer',
 			'null' => false,
@@ -75,15 +67,14 @@ class ClopeCluster extends ClopeSchema {
 			'null' => true,
 			'default' => null,
 			'length' => 5
+		),
+		'indexes' => array(
+			'isize' => array(
+				'column' => 'size',
+				'unique' => false
+			)
 		)
 	);
-
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @var int
-	 */
-	public $recursive = -1;
 
 	/**
 	 * Cluster size
@@ -121,4 +112,40 @@ class ClopeCluster extends ClopeSchema {
 		return $this->field('transactions');
 	}
 
- }
+	/**
+	 * {@inheritdoc}
+	 * 
+	 * @param array $results
+	 * @param bool $primary
+	 * @return array
+	 */
+	public function afterFind($results, $primary = false) {
+		$results = parent::afterFind($results, $primary);
+		foreach ($results as &$cluster) {
+			if (!isset($cluster['ClopeTransaction'])) {
+				continue;
+			}
+			$cluster[$this->alias]['attributesCounts'] = $this->_attributesCounts($cluster);
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Calculates attributes counts statistics
+	 * 
+	 * @param array $cluster
+	 * @return array
+	 */
+	protected function _attributesCounts($cluster) {
+		$attributesCounts = array();
+		foreach ($cluster['ClopeTransaction'] as $transaction) {
+			foreach ($transaction['ClopeAttribute'] as $attribute) {
+				$name = $attribute['attribute'];
+				$attributesCounts[$name] = isset($attributesCounts[$name]) ? $attributesCounts[$name] + 1: 1;
+			}
+		}
+		return $attributesCounts;
+	}
+
+}

@@ -8,7 +8,6 @@
  * @package ClopeClustering
  * @subpackage Model
  */
-
 App::uses('ClopeSchema', 'ClopeClustering.Model');
 
 /**
@@ -43,14 +42,7 @@ class ClopeAttribute extends ClopeSchema {
 	 *
 	 * @var array
 	 */
-	public $actsAs = array('Containable');
-
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @var array
-	 */
-	public $_schema = array(
+	protected $_schema = array(
 		'id' => array(
 			'type' => 'integer',
 			'null' => false,
@@ -78,40 +70,25 @@ class ClopeAttribute extends ClopeSchema {
 			'itransaction_id' => array(
 				'column' => 'transaction_id',
 				'unique' => false
-			)
+			),
+			'itransaction_attribute' => array(
+				'column' => array('transaction_id', 'attribute'),
+				'unique' => false
+			),
 		)
 	);
 
 	/**
-	 * {@inheritdoc}
-	 *
-	 * @var int
-	 */
-	public $recursive = -1;
-
-	/**
 	 * Count of given Attribute in given Cluster
 	 *
-	 * @param string $attribute
-	 * @param int $clusterId
+	 * @param string $attributeName
+	 * @param array $cluster
 	 *
 	 * @return int
 	 */
-	public function countInCluster($attribute, $clusterId) {
-		$transaction_ids = $this->ClopeTransaction->find('list', array(
-			'conditions' => array('cluster_id' => $clusterId),
-			'fields' => array('ClopeTransaction.id')
-		));
-
-		if (empty($transaction_ids)) {
-			return 0;
-		}
-
-		return $this->find('count', array(
-			'conditions' => array(
-				'transaction_id' => $transaction_ids,
-				'attribute' => $attribute
-		)));
+	public function countInCluster($attributeName, $cluster) {
+		$attributesCounts = $cluster['ClopeCluster']['attributesCounts'];
+		return empty($attributesCounts[$attributeName]) ? 0 : $attributesCounts[$attributeName];
 	}
 
- }
+}

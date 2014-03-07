@@ -11,7 +11,6 @@
  * @subpackage Model
  */
 
-
 /**
  * Clope Clustering
  *
@@ -28,9 +27,18 @@ class Clope extends AppModel {
 	public $useTable = false;
 
 	/**
+	 * True if clustering is not finished
+	 * 
 	 * @var bool
 	 */
-	private $clustering_changed = false;
+	protected $_clusteringChanged = false;
+
+	/**
+	 * Clusters
+	 *
+	 * @var array 
+	 */
+	protected $_clusters = null;
 
 	/**
 	 * {@inheritdoc}
@@ -52,19 +60,17 @@ class Clope extends AppModel {
 	 * @return array
 	 */
 	public function clusterize($transactions, $params) {
-		$this->ClopeCluster->createSchema($this->clusteringID());
-		$this->ClopeTransaction->createSchema($this->clusteringID());
-		$this->ClopeAttribute->createSchema($this->clusteringID());
-
 		$this->repulsion = $params['repulsion'];
 
 		// Add transactions
-		foreach($transactions as $id=>$transaction) {
+		foreach ($transactions as $id => $transaction) {
 			$data = array(
 				'ClopeTransaction' => array(
 					'custom_id' => $id
 				),
-				'ClopeAttribute' => Hash::map($transaction, '{n}', function($attr){ return array('attribute' => $attr); })
+				'ClopeAttribute' => Hash::map($transaction, '{n}', function($attr) {
+					return array('attribute' => $attr);
+				})
 			);
 			$this->ClopeTransaction->saveAssociated($data, array('deep' => true));
 		}
@@ -75,7 +81,7 @@ class Clope extends AppModel {
 
 		// Result
 		$groupedByCluster = array();
-		foreach ($transactions as $id=>&$transaction) {
+		foreach ($transactions as $id => &$transaction) {
 			$groupedByCluster[$this->ClopeTransaction->clusterID($id)][$id] = $transaction;
 			unset($transactions[$id]);
 		}
@@ -86,16 +92,18 @@ class Clope extends AppModel {
 	/**
 	 * Clustering algorithm
 	 */
-	private function _clusterize() {
-		$this->setClusteringIncomplete();
-		while (!$this->ifClusteringComplete()) {
-			$this->ClopeTransaction->reset_pointer();
-			$this->setClusteringComplete();
+	protected function _clusterize() {
+		$this->_resetClusters();
+		$this->_setClusteringIncomplete();
+		while (!$this->_ifClusteringComplete()) {
+			$this->ClopeTransaction->resetPointer();
+			$this->_setClusteringComplete();
 			while ($transaction = $this->ClopeTransaction->getNext()) {
-				$bestClusterID = $this->bestClusterID($transaction, $this->repulsion);
+				$bestClusterID = $this->_bestClusterID($transaction, $this->repulsion);
 				if ($this->ClopeTransaction->moveToCluster($transaction['ClopeTransaction']['id'], $transaction['ClopeTransaction']['cluster_id'], $bestClusterID)) {
 					$this->_updateClusterFeatures($transaction['ClopeTransaction']['cluster_id'], $bestClusterID);
-					$this->setClusteringIncomplete();
+					$this->_setClusteringIncomplete();
+					$this->_resetClusters(array($transaction['ClopeTransaction']['cluster_id'], $bestClusterID));
 				}
 			}
 		}
@@ -109,29 +117,96 @@ class Clope extends AppModel {
 	 *
 	 * @return int
 	 */
-	private function bestClusterID($transaction, $repulsion) {
+	protected function _bestClusterID($transaction, $repulsion) {
 		$this->_clusterFeatures = array();
-		if ($this->ClopeCluster->find('count') == 0 || $this->ClopeCluster->find('count', array('conditions' => 'size = 0')) == 0) {
-			$this->ClopeCluster->create();
-			$this->ClopeCluster->save(array('width' => 0, 'size' => 0, 'transactions' => 0));
-		}
 		$delta = 0;
 		$bestClusterID = null;
-		foreach ($this->ClopeCluster->find('all') as $cluster) {
+		foreach ($this->_getClusters() as $cluster) {
 			if ($transaction['ClopeTransaction']['cluster_id'] == $cluster['ClopeCluster']['id']) {
-				$delta = $this->deltaRemove($cluster, $transaction, $repulsion);
+				$delta = $this->_deltaRemove($cluster, $transaction, $repulsion);
 			} else {
-				$delta = $this->deltaAdd($cluster, $transaction, $repulsion);
+				$delta = $this->_deltaAdd($cluster, $transaction, $repulsion);
 			}
-			if (!isset($max_delta)
-				|| ($delta > $max_delta
-					|| ($transaction['ClopeTransaction']['cluster_id'] == $cluster['ClopeCluster']['id'] && $delta == $max_delta)))
-			{
-				$max_delta = $delta;
+			if (!isset($maxDelta) || ($delta > $maxDelta || ($transaction['ClopeTransaction']['cluster_id'] == $cluster['ClopeCluster']['id'] && $delta == $maxDelta))) {
+				$maxDelta = $delta;
 				$bestClusterID = $cluster['ClopeCluster']['id'];
 			}
 		}
 		return $bestClusterID;
+	}
+
+	/**
+	 * Returns all clusters
+	 * 
+	 * @return array
+	 */
+	protected function _getClusters() {
+		if (!$this->_clusters) {
+			$clusters = $this->ClopeCluster->find('all', array(
+				'contain' => array('ClopeTransaction' => array(
+						'ClopeAttribute'
+					))
+			));
+			$this->_clusters = array();
+			foreach ($clusters as $cluster) {
+				$this->_clusters[$cluster['ClopeCluster']['id']] = $cluster;
+			}
+		}
+		return $this->_clusters;
+	}
+
+	/**
+	 * Reset clusters. If specified $clustersIds then resets only this clusters.
+	 * Also handle zero cluster
+	 * 
+	 * @param array $clustersIds
+	 */
+	protected function _resetClusters($clustersIds = null) {
+		$zeroCreated = $this->_createZeroCluster();
+		if (!$clustersIds) {
+			$this->_clusters = null;
+			return;
+		}
+		foreach (array_filter($clustersIds) as $clustersId) {
+			$this->_clusters[$clustersId] = $this->ClopeCluster->find('first', array(
+				'conditions' => array(
+					'id' => $clustersId
+				),
+				'contain' => array('ClopeTransaction' => array(
+						'ClopeAttribute'
+					))
+			));
+		}
+
+		if ($zeroCreated) {
+			$zeroCluster = $this->ClopeCluster->find('first', array(
+				'conditions' => array(
+					'size' => 0
+				),
+				'contain' => array('ClopeTransaction' => array(
+						'ClopeAttribute'
+					))
+			));
+			$this->_clusters[$zeroCluster['ClopeCluster']['id']] = $zeroCluster;
+		}
+	}
+
+	/**
+	 * Create zero cluster if it not already created
+	 * 
+	 * @return bool True if created, false if it was created previously
+	 */
+	protected function _createZeroCluster() {
+		$zeroClusterExists = (bool)$this->ClopeCluster->find('first', array(
+					'conditions' => array(
+						'size' => 0
+					), 'fields' => 'id')
+		);
+		if (!$zeroClusterExists) {
+			$this->ClopeCluster->create();
+			$this->ClopeCluster->save(array('width' => 0, 'size' => 0, 'transactions' => 0));
+		}
+		return !$zeroClusterExists;
 	}
 
 	/**
@@ -140,7 +215,7 @@ class Clope extends AppModel {
 	 * @param int $fromClusterID
 	 * @param int $toClusterID
 	 */
-	private function _updateClusterFeatures($fromClusterID, $toClusterID) {
+	protected function _updateClusterFeatures($fromClusterID, $toClusterID) {
 		if ($fromClusterID == $toClusterID) {
 			return false;
 		}
@@ -148,23 +223,21 @@ class Clope extends AppModel {
 		// Update cluster FROM which Transaction was moved
 		if (!is_null($fromClusterID)) {
 			$this->ClopeCluster->updateAll(
-				array(
-					'size' => $this->_clusterFeatures[$fromClusterID]['size'],
-					'width' => $this->_clusterFeatures[$fromClusterID]['width'],
-					'transactions' => 'transactions - 1'
-				),
-				array('id' => $fromClusterID)
+					array(
+				'size' => $this->_clusterFeatures[$fromClusterID]['size'],
+				'width' => $this->_clusterFeatures[$fromClusterID]['width'],
+				'transactions' => 'transactions - 1'
+					), array('id' => $fromClusterID)
 			);
 		}
 
 		// Update cluster TO which Transaction was moved
 		$this->ClopeCluster->updateAll(
-			array(
-				'size' => $this->_clusterFeatures[$toClusterID]['size'],
-				'width' => $this->_clusterFeatures[$toClusterID]['width'],
-				'transactions' => 'transactions + 1'
-			),
-			array('id' => $toClusterID)
+				array(
+			'size' => $this->_clusterFeatures[$toClusterID]['size'],
+			'width' => $this->_clusterFeatures[$toClusterID]['width'],
+			'transactions' => 'transactions + 1'
+				), array('id' => $toClusterID)
 		);
 	}
 
@@ -178,14 +251,12 @@ class Clope extends AppModel {
 	 *
 	 * @return float
 	 */
-	private function deltaAdd($cluster, $transaction, $repulsion) {
+	protected function _deltaAdd($cluster, $transaction, $repulsion) {
 		$clusterID = $cluster['ClopeCluster']['id'];
 		$sizeNew = $cluster['ClopeCluster']['size'] + count($transaction['ClopeAttribute']);
 		$widthNew = $cluster['ClopeCluster']['width'];
 		foreach ($transaction['ClopeAttribute'] as $attribute) {
-			if ($cluster['ClopeCluster']['transactions'] == 0
-				|| $this->ClopeAttribute->countInCluster($attribute['attribute'], $clusterID) == 0)
-			{
+			if ($cluster['ClopeCluster']['transactions'] == 0 || $this->ClopeAttribute->countInCluster($attribute['attribute'], $cluster) == 0) {
 				$widthNew += 1;
 			}
 		}
@@ -214,12 +285,14 @@ class Clope extends AppModel {
 	 *
 	 * @return float
 	 */
-	private function deltaRemove($cluster, $transaction, $repulsion) {
+	protected function _deltaRemove($cluster, $transaction, $repulsion) {
 		$clusterID = $cluster['ClopeCluster']['id'];
 		$sizeNew = $cluster['ClopeCluster']['size'] - count($transaction['ClopeAttribute']);
 		$widthNew = $cluster['ClopeCluster']['width'];
 		foreach ($transaction['ClopeAttribute'] as $attribute) {
-			if ($this->ClopeAttribute->countInCluster($attribute['attribute'], $clusterID) == 1) $widthNew -= 1;
+			if ($this->ClopeAttribute->countInCluster($attribute['attribute'], $cluster) == 1) {
+				$widthNew -= 1;
+			}
 		}
 		$this->_clusterFeatures[$clusterID]['size'] = $sizeNew;
 		$this->_clusterFeatures[$clusterID]['width'] = $widthNew;
@@ -241,38 +314,22 @@ class Clope extends AppModel {
 	 *
 	 * @return bool
 	 */
-	private function ifClusteringComplete() {
-		return !(bool)$this->clustering_changed;
+	protected function _ifClusteringComplete() {
+		return !(bool)$this->_clusteringChanged;
 	}
 
 	/**
 	 * Mark current Clustering session as Complete
 	 */
-	private function setClusteringComplete() {
-		$this->clustering_changed = false;
+	protected function _setClusteringComplete() {
+		$this->_clusteringChanged = false;
 	}
 
 	/**
 	 * Mark current Clustering session as Incomplete
 	 */
-	private function setClusteringIncomplete() {
-		$this->clustering_changed = true;
-	}
-
-	/**
-	 * Generate random string
-	 *
-	 * @param int $length
-	 *
-	 * @return string
-	 */
-	private function clusteringId() {
-		if (isset($this->clusteringId)) {
-			return $this->clusteringId;
-		} else {
-			$this->clusteringId = substr(md5(microtime()), rand(0, 26), 5);
-			return $this->clusteringId;
-		}
+	protected function _setClusteringIncomplete() {
+		$this->_clusteringChanged = true;
 	}
 
 }

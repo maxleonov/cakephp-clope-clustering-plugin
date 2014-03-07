@@ -8,7 +8,6 @@
  * @package ClopeClustering
  * @subpackage Model
  */
-
 App::uses('ClopeSchema', 'ClopeClustering.Model');
 
 /**
@@ -55,14 +54,7 @@ class ClopeTransaction extends ClopeSchema {
 	 *
 	 * @var array
 	 */
-	public $actsAs = array('Containable');
-
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @var array
-	 */
-	public $_schema = array(
+	protected $_schema = array(
 		'id' => array(
 			'type' => 'integer',
 			'null' => false,
@@ -83,26 +75,31 @@ class ClopeTransaction extends ClopeSchema {
 			'null' => true,
 			'default' => null,
 			'length' => 5
+		),
+		'indexes' => array(
+			'icluster_id' => array(
+				'column' => 'cluster_id',
+				'unique' => false
+			),
+			'icustom_id' => array(
+				'column' => array('custom_id'),
+				'unique' => false
+			),
 		)
 	);
 
 	/**
-	 * {@inheritdoc}
-	 *
+	 * Transaction position
+	 * 
 	 * @var int
 	 */
-	public $recursive = -1;
+	protected $_pointer = -1;
 
 	/**
-	 * @var int
+	 * Reset internal _pointer so that next getNext() call will return the very first transaction
 	 */
-	private $pointer = -1;
-
-	/**
-	 * Reset internal pointer so that next getNext() call will return the very first transaction
-	 */
-	public function reset_pointer() {
-		$this->pointer = -1;
+	public function resetPointer() {
+		$this->_pointer = -1;
 	}
 
 	/**
@@ -111,11 +108,11 @@ class ClopeTransaction extends ClopeSchema {
 	 * @return array
 	 */
 	public function getNext() {
-		$this->pointer += 1;
+		$this->_pointer += 1;
 		$this->contain('ClopeAttribute');
 		return $this->find('first', array(
-			'limit' => 1,
-			'offset' => $this->pointer
+					'limit' => 1,
+					'offset' => $this->_pointer
 		));
 	}
 
@@ -134,8 +131,7 @@ class ClopeTransaction extends ClopeSchema {
 		}
 
 		$this->updateAll(
-			array('cluster_id' => $toClusterID),
-			array("{$this->alias}.id" => $transactionID)
+				array('cluster_id' => $toClusterID), array("{$this->alias}.id" => $transactionID)
 		);
 
 		return true;
@@ -148,9 +144,9 @@ class ClopeTransaction extends ClopeSchema {
 	 *
 	 * @return int
 	 */
-	public function clusterID ($transactionCustomID) {
+	public function clusterID($transactionCustomID) {
 		return $this->field('cluster_id', array(
-			'custom_id' => $transactionCustomID
+					'custom_id' => $transactionCustomID
 		));
 	}
 
