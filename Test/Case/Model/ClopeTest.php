@@ -49,59 +49,59 @@ class ClopeTest extends CakeTestCase {
 		$result = $this->Clope->clusterize($transactions, $params);
 
 		$expected = array(
-			(int) 1 => array(
-				(int) 0 => array(
-					(int) 0 => 'a1',
-					(int) 1 => 'a2',
-					(int) 2 => 'a3'
+			(int)1 => array(
+				(int)0 => array(
+					(int)0 => 'a1',
+					(int)1 => 'a2',
+					(int)2 => 'a3'
 				),
-				(int) 1 => array(
-					(int) 0 => 'a1',
-					(int) 1 => 'a2',
-					(int) 2 => 'a3',
-					(int) 3 => 'a4'
+				(int)1 => array(
+					(int)0 => 'a1',
+					(int)1 => 'a2',
+					(int)2 => 'a3',
+					(int)3 => 'a4'
 				),
-				(int) 2 => array(
-					(int) 0 => 'a1',
-					(int) 1 => 'a2',
-					(int) 2 => 'a3',
-					(int) 3 => 'a4'
+				(int)2 => array(
+					(int)0 => 'a1',
+					(int)1 => 'a2',
+					(int)2 => 'a3',
+					(int)3 => 'a4'
 				)
 			),
-			(int) 2 => array(
-				(int) 3 => array(
-					(int) 0 => 'a5',
-					(int) 1 => 'a6',
-					(int) 2 => 'a7'
+			(int)2 => array(
+				(int)3 => array(
+					(int)0 => 'a5',
+					(int)1 => 'a6',
+					(int)2 => 'a7'
 				),
-				(int) 4 => array(
-					(int) 0 => 'a5',
-					(int) 1 => 'a6',
-					(int) 2 => 'a7'
+				(int)4 => array(
+					(int)0 => 'a5',
+					(int)1 => 'a6',
+					(int)2 => 'a7'
 				)
 			),
-			(int) 3 => array(
-				(int) 5 => array(
-					(int) 0 => 'a8',
-					(int) 1 => 'a9',
-					(int) 2 => 'a10'
+			(int)3 => array(
+				(int)5 => array(
+					(int)0 => 'a8',
+					(int)1 => 'a9',
+					(int)2 => 'a10'
 				),
-				(int) 6 => array(
-					(int) 0 => 'a8',
-					(int) 1 => 'a9',
-					(int) 2 => 'a10'
+				(int)6 => array(
+					(int)0 => 'a8',
+					(int)1 => 'a9',
+					(int)2 => 'a10'
 				),
-				(int) 7 => array(
-					(int) 0 => 'a8',
-					(int) 1 => 'a9',
-					(int) 2 => 'a10',
-					(int) 3 => 'a11'
+				(int)7 => array(
+					(int)0 => 'a8',
+					(int)1 => 'a9',
+					(int)2 => 'a10',
+					(int)3 => 'a11'
 				),
-				(int) 8 => array(
-					(int) 0 => 'a8',
-					(int) 1 => 'a9',
-					(int) 2 => 'a10',
-					(int) 3 => 'a12'
+				(int)8 => array(
+					(int)0 => 'a8',
+					(int)1 => 'a9',
+					(int)2 => 'a10',
+					(int)3 => 'a12'
 				)
 			)
 		);
@@ -126,19 +126,19 @@ class ClopeTest extends CakeTestCase {
 		$result = $this->Clope->clusterize($transactions, $params);
 
 		$expected = array(
-			(int) 1 => array(
-				(int) 0 => array(
-					(int) 0 => 'a1',
-					(int) 1 => 'a2',
-					(int) 2 => 'a3'
+			(int)1 => array(
+				(int)0 => array(
+					(int)0 => 'a1',
+					(int)1 => 'a2',
+					(int)2 => 'a3'
 				)
 			),
-			(int) 2 => array(
-				(int) 1 => array(
-					(int) 0 => 'a8',
-					(int) 1 => 'a9',
-					(int) 2 => 'a10',
-					(int) 3 => 'a12'
+			(int)2 => array(
+				(int)1 => array(
+					(int)0 => 'a8',
+					(int)1 => 'a9',
+					(int)2 => 'a10',
+					(int)3 => 'a12'
 				)
 			)
 		);
@@ -157,22 +157,22 @@ class ClopeTest extends CakeTestCase {
 		$result = $this->Clope->clusterize($transactions, $params);
 
 		$expected = array(
-			(int) 1 => array(
-				(int) 0 => array(
-					(int) 0 => 'a11',
-					(int) 1 => 'a12',
-					(int) 2 => 'a13'
-					)
-				),
-			(int) 2 => array(
-				(int) 1 => array(
-					(int) 0 => 'a18',
-					(int) 1 => 'a19',
-					(int) 2 => 'a10',
-					(int) 3 => 'a12'
-					)
+			(int)1 => array(
+				(int)0 => array(
+					(int)0 => 'a11',
+					(int)1 => 'a12',
+					(int)2 => 'a13'
 				)
-			);
+			),
+			(int)2 => array(
+				(int)1 => array(
+					(int)0 => 'a18',
+					(int)1 => 'a19',
+					(int)2 => 'a10',
+					(int)3 => 'a12'
+				)
+			)
+		);
 
 		$this->assertEqual($result, $expected);
 
@@ -189,22 +189,22 @@ class ClopeTest extends CakeTestCase {
 		$result = $this->Clope->clusterize($transactions, $params);
 
 		$expected = array(
-			(int) 1 => array(
-				(int) 0 => array(
-					(int) 0 => 'a11',
-					(int) 1 => 'a12',
-					(int) 2 => 'a13'
+			(int)1 => array(
+				(int)0 => array(
+					(int)0 => 'a11',
+					(int)1 => 'a12',
+					(int)2 => 'a13'
 				)
 			),
-			(int) 2 => array(
-				(int) 1 => array(
-					(int) 0 => 'a1',
-					(int) 1 => 'a1',
-					(int) 2 => 'a10',
-					(int) 3 => 'a12'
-					)
+			(int)2 => array(
+				(int)1 => array(
+					(int)0 => 'a1',
+					(int)1 => 'a1',
+					(int)2 => 'a10',
+					(int)3 => 'a12'
 				)
-			);
+			)
+		);
 
 		$this->assertEqual($result, $expected);
 	}
